@@ -25,7 +25,7 @@
 <div class="categories_list">
     {% for cat in categories %}
         <ul class="cat_ul">
-            <a href="{% url 'category_detail' cat.pk %}">
+            <a style="text-decoration: none" href="{% url 'category_detail' cat.pk %}">
                 <h3>{{ cat.name }}</h3>
             </a>
         </ul>
@@ -34,7 +34,7 @@
 
 <div class="post_list">
     {% for post in posts %}
-        <a href="{% url 'post_detail' post.pk %}"><h2>{{ post.title }}</h2></a>
+        <a style="text-decoration: none" href="{% url 'post_detail' post.pk %}"><h2>{{ post.title }}</h2></a>
         <img class="post_image" src="{{ post.image.url }}" alt="not found">
         <p>{{ post.description }}</p>
         <p>{{ post.author }}, {{ post.created }}</p>

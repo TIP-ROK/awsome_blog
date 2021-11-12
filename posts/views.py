@@ -1,7 +1,18 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib.auth.decorators import login_required
+from functools import wraps
+from .forms import PostForm, PostEditForm, CommentForm, SearchingForm, SearchingByDescriptionForm
+from .models import Post, Category, Comment
 
-from .forms import PostForm
-from .models import Post, Category
+
+def is_author(view_func):
+    @wraps(view_func)
+    def _wrapped_view(request, *args, **kwargs):
+        post = Post.objects.get(pk=kwargs['pk'])
+        if request.user.id == post.author.id:
+            return view_func(request, *args, **kwargs)
+        return redirect(post.get_absolute_url())
+    return _wrapped_view
 
 
 def post_list(request):
@@ -13,19 +24,31 @@ def post_list(request):
 
 def post_detail(request, pk):
     post = Post.objects.get(pk=pk)
-    return render(request, 'detail.html', {'post': post})
+    comments = Comment.objects.filter(post=post)
+    form = CommentForm()
+    if request.POST:
+        form = CommentForm(request.POST)
+        if form.is_valid():
+            cd = form.cleaned_data
+            Comment.objects.create(
+                author=request.user,
+                post=post,
+                content=cd['content']
+            )
+            return redirect(post.get_absolute_url())
+    return render(request, 'detail.html', {'post': post,
+                                           'form': form,
+                                           'comments': comments})
 
 
+@is_author
+@login_required(login_url='/account/login/')
 def post_create(request):
     form = PostForm()
     if request.POST:
         form = PostForm(request.POST, request.FILES)
         if form.is_valid():
-            print('form')
-            print(form)
             cd = form.cleaned_data
-            print('cd')
-            print(cd)
             Post.objects.create(title=cd['title'],
                                 image=request.FILES['image'],
                                 description=cd['description'],
@@ -36,3 +59,59 @@ def post_create(request):
             return redirect('post_list')
     return render(request, 'create.html', {'form': form})
 
+
+@is_author
+@login_required(login_url='/account/login/')
+def post_edit(request, pk):
+    post = get_object_or_404(Post, pk=pk)
+    if request.POST:
+        form = PostEditForm(request.POST or None, request.FILES or None, instance=post)
+        if form.is_valid():
+            post.save()
+            return redirect(post.get_absolute_url())
+    else:
+        form = PostEditForm(
+            initial={
+                'title': post.title,
+                'description': post.description,
+                'body': post.body,
+                'image': post.image,
+                'category': post.category
+            }
+        )
+
+    return render(request, 'edit.html', {'form': form})
+
+
+@is_author
+@login_required(login_url='/account/login/')
+def post_delete(request, pk):
+    post = get_object_or_404(Post, pk=pk)
+    if request.POST:
+        post.delete()
+        return redirect('post_list')
+    return render(request, 'delete.html', {'post': post})
+
+
+def post_search(request):
+    form = SearchingForm()
+    if request.POST:
+        form = SearchingForm(request.POST)
+        if form.is_valid():
+            cd = form.cleaned_data
+            posts = Post.objects.filter(title__contains=cd['title'])
+    return render(request, 'search_post.html', locals())
+
+
+def post_search_by_description(request):
+    form = SearchingByDescriptionForm()
+    print(form)
+    if request.POST:
+        form = SearchingByDescriptionForm(request.POST)
+        print(form)
+        if form.is_valid():
+            cd = form.cleaned_data
+            posts = Post.objects.filter(description__contains=cd['description'])
+            print(cd)
+            print(posts)
+    return render(request, 'search_post.html', locals())

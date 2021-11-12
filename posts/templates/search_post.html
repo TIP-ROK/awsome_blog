@@ -1,0 +1,50 @@
+<style>
+    .post_list {
+        max-width: 600px;
+        margin: 2rem auto;
+        text-align: center;
+    }
+    .post_image {
+        width: 600px;
+        height: auto;
+    }
+    .categories_list {
+        max-width: 600px;
+        margin: 2rem auto;
+        text-align: center;
+    }
+    .cat_ul {
+        display: inline-block;
+        text-decoration: none
+    }
+    }
+    .searching_by_description {
+        max-width: 600px;
+        margin: 2rem auto;
+        text-align: center;
+    }
+</style>
+
+{% extends 'base.html' %}
+
+{% block content %}
+    <div class="categories_list">
+        <form method="post">
+                {% csrf_token %}
+                {{ form }}
+                <button type="submit" class="btn btn-success">
+                    Search
+                </button>
+        </form>
+        {% for post in posts %}
+            <ul class="cat_ul">
+                <a style="text-decoration: none" href="{% url 'post_detail' post.pk %}"><h2>{{ post.title }}</h2></a>
+                <img class="post_image" src="{{ post.image.url }}" alt="not found">
+                <p>{{ post.description }}</p>
+                <p>{{ post.author }}, {{ post.created }}</p>
+                <hr>
+                </a>
+            </ul>
+        {% endfor %}
+    </div>
+{% endblock %}

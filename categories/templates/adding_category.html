@@ -1,0 +1,41 @@
+<style>
+    .categories_list {
+        margin: 2rem auto;
+        max-width: 600px;
+        text-align: center;
+    }
+    .category_adding {
+        margin: 2rem auto;
+        max-width: 600px;
+        text-align: center;
+    }
+</style>
+
+{% extends 'base.html' %}
+
+{% block title %}Post edit{% endblock %}
+
+{% block content %}
+    <div class="category_adding">
+        <h1>Category adding</h1>
+        <form method="post">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit">
+                add
+            </button>
+        </form>
+    </div>
+
+    <div class="categories_list">
+        <h2>Category list</h2>
+        {% for cat in categories %}
+            <a style="text-decoration: none" href="{% url 'category_detail' cat.pk %}"><h2> Run to: {{ cat.name }}</h2></a>
+            <a/>
+            <button type="submit"><a style="text-decoration: none" href="{% url 'category_delete' cat.pk %}">Delete: {{ cat.name }}</a>
+            <a/>
+            </button>
+            <hr>
+        {% endfor %}
+    </div>
+{% endblock %}
