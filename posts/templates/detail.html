@@ -19,35 +19,50 @@
     <img class="post_image" src="{{ post.image.url }}" alt="no image">
     <p>{{ post.body }}</p>
     <p>{{ post.author }}, {{ post.created }}</p>
-    <h2><a style="text-decoration: none" href="{% url 'post_list' %}">Back to posts</a></h2>
+    <p>likes {{ post.likes.count }}</p>
+
+    {% if request.user not in post.likes.all %}
+        <button class="btn btn-success">
+            <a href="{% url 'like' post.pk %}" style="color: white">Like</a>
+        </button>
+    {% else %}
+        <button class="btn btn-danger">
+            <a href="{% url 'like' post.pk %}" style="color: white">Unlike</a>
+        </button>
+    {% endif %}
+
+
+    {% if request.user == post.author %}
     <button class="btn btn-warning">
+        <a href="{% url 'post_edit' post.pk %}">Edit</a>
+    </button>
+    <button class="btn btn-danger">
+        <a href="{% url 'post_delete' post.pk %}">Delete</a>
+    </button>
+    {% endif %}
+
     {% if request.user.is_authenticated %}
-        {% if request.user == post.author %}
-                <a style="text-decoration: none" href="{% url 'post_edit' post.pk %}">Post edit</a>
+        <form method="post">
+            {% csrf_token %}
+            {{ form }}
+            <button type="submit" class="btn btn-success">
+                Comment!
             </button>
-            <button class="btn btn-danger">
-                <a style="text-decoration: none" href="{% url 'post_delete' post.pk %}">Delete</a>
-            </button>
-        {% endif %}
-            <form method="post">
-                {% csrf_token %}
-                {{ form }}
-                <button type="submit" class="btn btn-success">
-                    Comment!
-                </button>
-            </form>
+        </form>
     {% else %}
         <p><a href="{% url 'login' %}">Login</a> to comment!</p>
     {% endif %}
 
     {% if comments %}
         {% for comment in comments %}
-            <p>{{ comment.author }}</p>
             <p>{{ comment.content }}</p>
+            <p>{{ comment.author }}</p>
             <hr>
         {% endfor %}
     {% else %}
         <p>No comments yet!</p>
-    {% endif %}>
+    {% endif %}
+
+    <h2><a href="{% url 'post_list' %}">Back to posts</a></h2>
 </div>
 {% endblock %}

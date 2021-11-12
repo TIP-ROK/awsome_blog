@@ -38,6 +38,16 @@
         <img class="post_image" src="{{ post.image.url }}" alt="not found">
         <p>{{ post.description }}</p>
         <p>{{ post.author }}, {{ post.created }}</p>
+        <p>{{ post.likes.count }}</p>
+        {% if request.user not in post.likes.all %}
+            <button class="btn btn-danger">
+                <a style="text-decoration: none" href="{% url 'like_list' post.pk %}">Like</a>
+            </button>
+        {% else %}
+            <button class="btn btn-danger">
+                <a style="text-decoration: none" href="{% url 'like_list' post.pk %}">unLike</a>
+            </button>
+        {% endif %}
         <hr>
     {% endfor %}
 </div>

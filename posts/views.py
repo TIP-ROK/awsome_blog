@@ -5,6 +5,26 @@ from .forms import PostForm, PostEditForm, CommentForm, SearchingForm, Searching
 from .models import Post, Category, Comment
 
 
+@login_required(login_url='/account/login/')
+def like(request, pk):
+    post = Post.objects.get(pk=pk)
+    if request.user not in post.likes.all():
+        post.likes.add(request.user)
+    else:
+        post.likes.remove(request.user)
+    return redirect(post.get_absolute_url())
+
+
+@login_required(login_url='/account/login/')
+def like_list(request, pk):
+    post = Post.objects.get(pk=pk)
+    if request.user not in post.likes.all():
+        post.likes.add(request.user)
+    else:
+        post.likes.remove(request.user)
+    return redirect('post_list')
+
+
 def is_author(view_func):
     @wraps(view_func)
     def _wrapped_view(request, *args, **kwargs):
