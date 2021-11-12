@@ -35,6 +35,18 @@ def is_author(view_func):
     return _wrapped_view
 
 
+def is_comment_author(view_func):
+    @wraps(view_func)
+    def _wrapped_view(request, *args, **kwargs):
+        post = Post.objects.get(pk=kwargs['pk'])
+        comment = Comment.objects.get(pk=kwargs['comment_pk'])
+        print(kwargs)
+        if request.user.id == comment.author.id:
+            return view_func(request, *args, **kwargs)
+        return redirect(post.get_absolute_url())
+    return _wrapped_view
+
+
 def post_list(request):
     posts = Post.objects.all()
     categories = Category.objects.all()
@@ -135,3 +147,21 @@ def post_search_by_description(request):
             print(cd)
             print(posts)
     return render(request, 'search_post.html', locals())
+
+
+@is_comment_author
+def comment_edit(request, pk, comment_pk):
+    post = Post.objects.get(pk=pk)
+    comment = Comment.objects.get(pk=comment_pk)
+    if request.POST:
+        form = CommentForm(request.POST or None, instance=comment)
+        if form.is_valid():
+            comment.save()
+            return redirect(post.get_absolute_url())
+    else:
+        form = CommentForm(
+            initial={
+                'content': comment.content
+            }
+        )
+    return render(request, 'comment_edit.html', locals())

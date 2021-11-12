@@ -57,6 +57,9 @@
         {% for comment in comments %}
             <p>{{ comment.content }}</p>
             <p>{{ comment.author }}</p>
+            {% if request.user.id == comment.author.id %}
+                <a href="{% url 'comment_edit' post.pk comment.pk %}">Edit</a>
+            {% endif %}
             <hr>
         {% endfor %}
     {% else %}
