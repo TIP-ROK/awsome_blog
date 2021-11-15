@@ -60,6 +60,9 @@
             {% if request.user.id == comment.author.id %}
                 <a href="{% url 'comment_edit' post.pk comment.pk %}">Edit</a>
             {% endif %}
+            {% if request.user.id == comment.author.id %}
+                <a href="{% url 'comment_delete' post.pk comment.pk %}">Delete</a>
+            {% endif %}
             <hr>
         {% endfor %}
     {% else %}

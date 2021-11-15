@@ -137,15 +137,11 @@ def post_search(request):
 
 def post_search_by_description(request):
     form = SearchingByDescriptionForm()
-    print(form)
     if request.POST:
         form = SearchingByDescriptionForm(request.POST)
-        print(form)
         if form.is_valid():
             cd = form.cleaned_data
             posts = Post.objects.filter(description__contains=cd['description'])
-            print(cd)
-            print(posts)
     return render(request, 'search_post.html', locals())
 
 
@@ -165,3 +161,11 @@ def comment_edit(request, pk, comment_pk):
             }
         )
     return render(request, 'comment_edit.html', locals())
+
+
+@is_comment_author
+def comment_delete(request, pk, comment_pk):
+    post = Post.objects.get(pk=pk)
+    comment = Comment.objects.get(pk=comment_pk)
+    comment.delete()
+    return redirect(post.get_absolute_url())

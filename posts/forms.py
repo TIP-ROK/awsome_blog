@@ -1,6 +1,7 @@
 from django import forms
 from categories.models import Category
 from .models import Post, Comment
+import re
 
 
 class PostForm(forms.Form):
@@ -24,6 +25,14 @@ class CommentForm(forms.ModelForm):
     class Meta:
         model = Comment
         fields = ['content']
+
+    def clean_content(self):
+        bad_words = ['wtf', 'kozel', 'php']
+        comment = self.data['content']
+        for word in bad_words:
+            if word in comment:
+                comment = comment.replace(word, '*' * len(word))
+        return comment
 
 
 class SearchingForm(forms.Form):
