@@ -43,7 +43,8 @@ INSTALLED_APPS = [
 
     # locale
     'posts',
-    'categories'
+    'categories',
+    'wall'
 ]
 
 MIDDLEWARE = [

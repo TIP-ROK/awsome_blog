@@ -73,7 +73,6 @@ def post_detail(request, pk):
                                            'comments': comments})
 
 
-@is_author
 @login_required(login_url='/account/login/')
 def post_create(request):
     form = PostForm()

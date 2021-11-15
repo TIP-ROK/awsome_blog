@@ -8,4 +8,5 @@ urlpatterns = [
     path('', include('posts.urls')),
     path('category/', include('categories.urls')),
     path('account/', include('account.urls')),
+    path('author_wall/', include('wall.urls')),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
